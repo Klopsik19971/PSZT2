@@ -23,7 +23,7 @@ bool sortCol::sort_col::operator() (const std::vector<double>& v1, const std::ve
 		for(unsigned int i = 0; i < v1.size(); ++i)
 		{
 			if(priority != i && v1[i] != v2[i])
-				return v1[i] > v2[i];
+				return v1[i] < v2[i];
 		}
-	return v1[priority] > v2[priority];
+	return v1[priority] < v2[priority];
 }

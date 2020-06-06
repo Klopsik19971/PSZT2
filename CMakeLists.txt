@@ -10,4 +10,4 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 include_directories(inc)
-add_executable(PSZT2 src/main.cc src/data_read.cc inc/data_read.hpp)
+add_executable(PSZT2 src/main.cc src/data_read.cc inc/data_read.hpp src/sort_col.cc inc/sort_col.hpp)

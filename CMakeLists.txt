@@ -9,4 +9,5 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
-add_executable(PSZT2 src/main.cc)
+include_directories(inc)
+add_executable(PSZT2 src/main.cc src/data_read.cc inc/data_read.hpp)

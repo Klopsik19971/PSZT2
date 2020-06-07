@@ -1,9 +1,9 @@
 #ifndef SORT_COL_HPP_
 #define SORT_COL_HPP_
 
-#include <vector>
+#include "common.hpp"
 
-enum colType{fixed_addicity, volatile_addicity, citric_acid, residual_sugar, chlorides, free_sulfur_dioxide, total_sulfur_dioxide, density, pH, sulphrates, alcohol, quality};
+#include <vector>
 
 class sortCol
 {

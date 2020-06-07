@@ -1,5 +1,6 @@
 #include "data_read.hpp"
 #include "sort_col.hpp"
+#include "calculate_gini.hpp"
 #include <vector>
 #include <iostream>
 
@@ -17,12 +18,13 @@ int main()
 	{	
 		std::cerr<<e.what()<<std::endl;
 	}
-	sortCol::sort(vineWhite.begin(), vineWhite.end(), colType::quality);
+	/*sortCol::sort(vineWhite.begin(), vineWhite.end(), colType::quality);
 	for(unsigned int i = 0; i < vineWhite.size(); ++i)
 	{
 		for(unsigned int j = 0; j < vineWhite[i].size(); ++j)
 			std::cout<<vineWhite[i][j]<<" ";
 		std::cout<<std::endl;	
-	}	
+	}*/
+	gini(vineWhite);	
 	return 0;
 }

@@ -4,7 +4,7 @@
 #include <vector>
 #include <set>
 
-void gini(std::vector<std::vector<double>> &dataSetTable);
-double calculateGini(std::vector<std::vector<double>> &dataSetTable, int rows, int columns, int whatColumn, std::set<double> currentDecidingParameters);
+double gini(std::vector<std::vector<double>> &dataSetTable);
+double calculateGini(std::vector<std::vector<double>> &dataSetTable, int type);
 
 #endif //CALCULATE_GINI_HPP_

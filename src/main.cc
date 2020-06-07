@@ -25,6 +25,7 @@ int main()
 			std::cout<<vineWhite[i][j]<<" ";
 		std::cout<<std::endl;	
 	}*/
-	gini(vineWhite);	
+	std::cout<<gini(vineWhite)<<std::endl;
+		
 	return 0;
 }

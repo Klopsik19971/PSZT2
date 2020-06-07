@@ -6,130 +6,60 @@
 #include "data_read.hpp"
 #include "sort_col.hpp"
 
-void gini(std::vector<std::vector<double>> &dataSetTable)
+double gini(std::vector<std::vector<double>> &dataSetTable)
 {
-	int rows = dataSetTable.size(); // Tu bedziemy trzymac ilosc wierszy naszej tabeli
-	int cols = dataSetTable[0].size(); // Tu bedziemy trzymali ilosc kolumn naszej tabeli
-	
-	double startingAvarage = 0; // Poczatkowa srednia wartosc, ktora umiescimy w korzeniu naszego drzewa
-
-	for (int iterator = 0; iterator < rows; iterator++)
+	double average = 0;
+	double best = 2;
+	for(unsigned int i = 0; i < dataSetTable.size(); ++i)
 	{
-		startingAvarage += dataSetTable[iterator][cols - 1]; // Bierzemy ostatnia wartosc z kazdego wiersza, to znaczy cala ostatnia kolumne.
-	}
-	startingAvarage /= rows; // Nasza srednia, bedzie liczona jako suma calej ostatniej kolumny podzielic na ilosc wierszy
-	
-	for (int iterator = 0; iterator < rows; iterator++)
+		average+=dataSetTable[i][static_cast<int>(colType::quality)];
+	} 
+	average/=dataSetTable.size();
+	for(unsigned int i = 0; i < dataSetTable.size(); ++i)
 	{
-		dataSetTable[iterator].push_back(dataSetTable[iterator][cols - 1] - startingAvarage); // Tutaj dodajemy druga kolumne na resiudale.
-	}
-
-	cols++; // Liczba kolumn nam przyrosla o jeden, poniewaz dodalismy residuale
-
-	std::set<double> decidingParameters;
-	for (int i = 0; i < rows; i++)
+		dataSetTable[i].push_back(dataSetTable[i][static_cast<int>(colType::quality)]-average);
+	} 
+	for(int i = 0; i < static_cast<int>(colType::quality); ++i)
 	{
-		decidingParameters.insert(dataSetTable[i][cols - 1]); // Dodajemy do naszego zbioru set elementy ostatniej kolumny
+		best = fmin(best, calculateGini(dataSetTable, i));
 	}
-
-	for (std::set<double>::iterator k = decidingParameters.begin(); k != decidingParameters.end(); k++) {
-		//cout << *k << endl;
-	}
-	
-	double giniLowestFromAll = 2; // Tu bedziemy trzymac najmniejszego giniego ze wszystkich kolumn
-	
-	for (int i = 0; i < cols; i++)
-	{
-		double tempGini;
-		sortCol::sort(dataSetTable.begin(), dataSetTable.end(), colType::fixed_addicity);
-		for (int i = 0; i < rows; i++)
-		{
-			std::cout << dataSetTable[i][cols - 1] << std::endl; // Dodajemy do naszego zbioru set elementy ostatniej kolumny
-		}
-		tempGini = calculateGini(dataSetTable, rows, cols, i, decidingParameters);		
-	}
+	return best;
 }
 
-double calculateGini(std::vector<std::vector<double>> &dataSetTable , int rows, int columns, int whatColumn , std::set<double> currentDecidingParameters)
+double calculateGini(std::vector<std::vector<double>> &dataSetTable, int type)
 {
-	double average; // W tym wektorze trzymamy nasze srednie
-	double giniLowestfromColumn = 2; // Dwa zeby pierwsza wartosc dostala sie do srodka
-
-	for (int i = 0; i < rows - 1; i++) // minus 1 bo  nie liczymy dla ostatniego. Pierwszy z drugim, drugi z trzecim, ... Przedostatni z ostatnim
+	sortCol::sort(dataSetTable.begin(), dataSetTable.end(), static_cast<colType>(type));
+	std::vector<double> temp (11,0);
+	double first_inverval;
+	double second_interval;
+	double result = 2;
+	for(unsigned int i = 0; i < dataSetTable.size()-2; ++i)
 	{
-		double probabilityForLess = 0; // Tu bedziemy trzymali wartosc roznicy kwadratow prawdopodobienstw dla wartosci mniejszych od sredniej
-		double probabilityForHigher = 0; // Tu bedziemy trzymali wartosc roznicy kwadratow prawdopodobienstw dla wartosci wikeszych od sredniej
-
-		double numberOfGradesAllTogetherForLess = i + 1; // Tutaj bedziemy trzymali sumaryczna ilosc rekordow mniejszych od naszej sredniej 
-		double numberOfGradesAllTogetherForHigher = rows - (i + 1); // Tutaj bedziemy trzymali sumaryczna ilosc rekordow wiekszych od naszej sredniej
-
-		if (dataSetTable[i][whatColumn] != dataSetTable[i + 1][whatColumn]) // Liczymy srednia jesli wartosci sa rozne
-			average = (dataSetTable[i][whatColumn] + dataSetTable[i + 1][whatColumn] / 2);
-		else
-			continue;
-		
-		std::vector<int> numberOfEachGradeForLess(currentDecidingParameters.size());
-		std::vector<int> numberOfEachGradeForHigher(currentDecidingParameters.size());
-
-		for (int j = 0; j < numberOfGradesAllTogetherForLess; j++) // po tej stronie tabeli znajduja sie wartosci mniejsze od naszej sredniej
+		if(dataSetTable[i][type]!=dataSetTable[i+1][type])
 		{
-
-			int counter = 0;
-			for (std::set<double>::iterator k = currentDecidingParameters.begin(); k != currentDecidingParameters.end(); k++) {
-
-				if (dataSetTable[j][columns - 1] == *k)
-				{
-					numberOfEachGradeForLess[counter]++; // Na tej pozycji gdzie jestesmy w naszym secie zwiekszamy wartosc o jeden
-					break;
-				}
-				counter++;
+			first_inverval = 1;
+			second_interval = 1;
+			for(unsigned int j = 0; j <=i; ++j)
+			{
+				++temp[dataSetTable[j][static_cast<int>(colType::quality)]];
 			}
-			//Czyli zwiekszamy ilosc danych ocen w tabeli
-		}
-
-		for (int j = i + 1; j < rows; j++) // Po tej stronie tabeli znajduja sie wartosci wieksze od naszej sredniej
-		{
-			int counter = 0;
-			for (std::set<double>::iterator k = currentDecidingParameters.begin(); k != currentDecidingParameters.end(); k++) {
-
-				//cout << "DODAWANIE DO LICZNIKA TYCH DLA WIEKSZYCH" << endl << endl;
-				if (dataSetTable[j][columns - 1] == *k)
-				{
-					
-					numberOfEachGradeForHigher[counter]++; // Na tej pozycji gdzie jestesmy w naszym secie zwiekszamy wartosc o jeden
-					//cout << "numberOfEachGradeForHigher[" << counter << "]" << "=" << numberOfEachGradeForHigher[counter]++;
-					continue;
-				}
-				counter++;
+			for(unsigned int j = 0; j < temp.size(); ++j)
+			{
+				first_inverval-=pow(temp[j]/(i+1),2);
+				temp[j]=0;
 			}
+			for(unsigned int j = i+1; j < dataSetTable.size(); ++j)
+			{
+				++temp[dataSetTable[j][static_cast<int>(colType::quality)]];
+			}
+			for(unsigned int j = 0; j < temp.size(); ++j)
+			{
+				second_interval-=pow(temp[j]/(dataSetTable.size()-i-1),2);
+				temp[j]=0;
+			}
+			result = fmin(result, (first_inverval*(i+1)/dataSetTable.size())+(second_interval*(dataSetTable.size()-i-1)/dataSetTable.size()));
 		}
 
-
-		for (int j = 0; j < currentDecidingParameters.size(); j++)
-		{
-			probabilityForLess += pow(numberOfEachGradeForLess[j] / numberOfGradesAllTogetherForLess, 2.0); // Kwadrat prawdopodobienstwa wystapienia danej liczby
-			//cout << "numberOfGradesAllTogetherForLess " << numberOfGradesAllTogetherForLess << endl;
-			//cout << numberOfEachGradeForLess[j]  << "ile z kazdego typu dla mniejszego" << endl;
-
-			probabilityForHigher += pow(numberOfEachGradeForHigher[j] / numberOfGradesAllTogetherForHigher, 2.0); // Kwadrat prawdopodobienstwa wystapienia danej liczby
-			//cout << "numberOfGradesAllTogetherForHigher " << numberOfGradesAllTogetherForHigher << endl;
-			//cout <<numberOfEachGradeForHigher[j]  << " ile z kazdego typu dla wiekszego" << endl;
-		}
-
-
-		probabilityForLess = 1 - probabilityForLess;
-		probabilityForHigher = 1 - probabilityForHigher;
-
-		//cout << "probabilityForHigher " << probabilityForHigher << endl;
-
-		// Teraz musimy policzyc Gini impurity, z udzialu obydwu tych liczb
-		double giniTemp = probabilityForLess * (numberOfGradesAllTogetherForLess / rows) + probabilityForHigher * (numberOfGradesAllTogetherForHigher / rows);
-
-
-		
-		if (giniTemp < giniLowestfromColumn)
-			giniLowestfromColumn = giniTemp;
-		std::cout << giniTemp <<" "<<i<< std::endl;
 	}
-	return giniLowestfromColumn;
+	return result;
 }

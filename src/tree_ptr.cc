@@ -7,6 +7,8 @@ tree_ptr::tree_ptr(nodeType t, std::vector<double>& d)
 	 col_type(static_cast<colType>(0))
 {
 	data = d;
+	L = nullptr;
+	R = nullptr;
 }
 
 tree_ptr::tree_ptr(nodeType t, double d, colType type)
@@ -38,6 +40,13 @@ void tree_ptr::add_to_data_node(double d)
 {
 	check_node_type(nodeType::data);
 	data.push_back(d);
+}
+
+bool tree_ptr::is_decision()
+{
+	if(node_type == nodeType::decision)
+		return true;	
+	return false;
 }
 
 void tree_ptr::check_node_type(nodeType t)

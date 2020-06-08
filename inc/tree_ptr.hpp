@@ -16,12 +16,13 @@ public:
 	double get_decision_node_val();
 	std::vector<double>& get_data_node_val();
 	void add_to_data_node(double d);
+	tree_ptr* L;
+	tree_ptr* R;
+	bool is_decision();
 private:
 	const nodeType node_type;
 	std::vector<double> data;
 	const colType col_type;
-	tree_ptr* L;
-	tree_ptr* R;
 
 	void check_node_type(nodeType t);
 };

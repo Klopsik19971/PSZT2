@@ -9,9 +9,9 @@ void sortCol::sort(std::vector<std::vector<double>>::iterator first, std::vector
 
 sortCol::sort_col::sort_col(colType type)
 {
-	if(static_cast<int>(type)>static_cast<int>(colType::quality)||static_cast<int>(type)<0)
+	if(static_cast<int>(type)>static_cast<int>(colType::medv)||static_cast<int>(type)<0)
 		throw std::runtime_error("Wrong use of sort\n");
-	for(int i = 0; i <= static_cast<int>(colType::quality); ++i)
+	for(int i = 0; i <= static_cast<int>(colType::medv); ++i)
 	{
 		if(static_cast<int>(type) == i)
 		{

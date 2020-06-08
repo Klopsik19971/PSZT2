@@ -2,9 +2,21 @@
 #define CALCULATE_GINI_HPP_
 
 #include <vector>
-#include <set>
+#include "common.hpp"
 
-double gini(std::vector<std::vector<double>> &dataSetTable);
-double calculateGini(std::vector<std::vector<double>> &dataSetTable, int type);
+class giniResult
+{
+public:
+	double result;
+	double average;
+	colType type;
+	int idx;
+	explicit giniResult(double res, double avg, colType t, int i, std::vector<bool> v);
+	bool operator>(const giniResult& g);
+	std::vector<bool> vieved;
+};
+
+giniResult gini(std::vector<std::vector<double>>::iterator first, std::vector<std::vector<double>>::iterator last, unsigned int size, giniResult prev);
+giniResult calculateGini(std::vector<std::vector<double>>::iterator first, std::vector<std::vector<double>>::iterator last, unsigned int size, giniResult prev, int type);
 
 #endif //CALCULATE_GINI_HPP_

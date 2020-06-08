@@ -22,7 +22,7 @@ void decision_tree::make_node(tree_ptr** node, std::vector<std::vector<double>>:
 		std::cout<<std::endl;
 	}
 	std::cout<<"---------------------------------------------"<<std::endl<<std::endl;*/
-	if(temp>g)
+	if(temp.average == DBL_MAX)
 	{
 		std::vector<double> data;
 		for(int i = 0; i < size; ++i)

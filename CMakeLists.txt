@@ -10,4 +10,4 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 include_directories(inc)
-add_executable(PSZT2 src/main.cc src/data_read.cc inc/data_read.hpp src/sort_col.cc inc/sort_col.hpp inc/common.hpp src/tree_ptr.cc inc/tree_ptr.hpp src/calculate_gini.cc inc/calculate_gini.hpp src/decision_tree.cc inc/decision_tree.hpp)
+add_executable(PSZT2 src/main.cc src/data_read.cc inc/data_read.hpp src/sort_col.cc inc/sort_col.hpp inc/common.hpp src/tree_ptr.cc inc/tree_ptr.hpp src/calculate_gini.cc inc/calculate_gini.hpp src/decision_tree.cc inc/decision_tree.hpp src/make_prediction.cc inc/make_prediction.hpp)

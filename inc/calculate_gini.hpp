@@ -4,6 +4,8 @@
 #include <vector>
 #include "common.hpp"
 
+class decision_tree;
+
 class giniResult
 {
 public:
@@ -18,5 +20,7 @@ public:
 
 giniResult gini(std::vector<std::vector<double>>::iterator first, std::vector<std::vector<double>>::iterator last, unsigned int size, giniResult prev);
 giniResult calculateGini(std::vector<std::vector<double>>::iterator first, std::vector<std::vector<double>>::iterator last, unsigned int size, giniResult prev, int type);
+double make_average(std::vector<std::vector<double>>& dataSetTable);
+void make_new_average(std::vector<std::vector<double>>& dataSetTable);
 
 #endif //CALCULATE_GINI_HPP_

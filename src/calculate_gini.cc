@@ -6,6 +6,7 @@
 #include <float.h>
 #include "data_read.hpp"
 #include "sort_col.hpp"
+#include <map>
 
 giniResult::giniResult(double res, double avg, colType t, int i, std::vector<bool> v)
 	:result(res),
@@ -45,10 +46,9 @@ giniResult gini(std::vector<std::vector<double>>::iterator first, std::vector<st
 giniResult calculateGini(std::vector<std::vector<double>>::iterator first, std::vector<std::vector<double>>::iterator last, unsigned int size, giniResult prev, int type)
 {
 	sortCol::sort(first, last, static_cast<colType>(type));
-	std::vector<double> counting_table;
+	std::map<double, int> counting_table;
 	double first_interval;
 	double second_interval;
-	double temp;
 	giniResult result(DBL_MAX, DBL_MAX, static_cast<colType>(0), 0, prev.vieved);
 	for(unsigned int i = 0; i < size-1; ++i)
 	{
@@ -56,40 +56,22 @@ giniResult calculateGini(std::vector<std::vector<double>>::iterator first, std::
 		{
 			first_interval = 1;
 			second_interval = 1;
-			sortCol::sort(first, first+i, static_cast<colType>(type));
-			counting_table.push_back(1);
-			temp = first[0][static_cast<int>(colType::medv)];
-			for(unsigned int j = 1; j <=i; ++j)
+			for(unsigned int j = 0; j <=i; ++j)
 			{
-				if(temp == first[j][static_cast<int>(colType::medv)])
-					++counting_table[counting_table.size()-1];
-				else
-				{
-					counting_table.push_back(1);
-					temp = first[j][static_cast<int>(colType::medv)];		
-				}
+				++counting_table[first[j][static_cast<int>(colType::residuum)]];
 			}
-			for(unsigned int j = 0; j < counting_table.size(); ++j)
+			for(auto iter = counting_table.begin(); iter != counting_table.end(); ++iter)
 			{
-				first_interval-=pow(counting_table[j]/(i+1),2);
+				first_interval-=pow(iter->second/(i+1),2);
 			}
 			counting_table.clear();
-			sortCol::sort(first+i+1, last, static_cast<colType>(type));
-			counting_table.push_back(1);
-			temp = first[i+1][static_cast<int>(colType::medv)];
-			for(unsigned int j = i+2; j < size; ++j)
+			for(unsigned int j = i+1; j < size; ++j)
 			{
-				if(temp == first[j][static_cast<int>(colType::medv)])
-					++counting_table[counting_table.size()-1];
-				else
-				{
-					counting_table.push_back(1);
-					temp = first[j][static_cast<int>(colType::medv)];		
-				}
+				++counting_table[first[j][static_cast<int>(colType::residuum)]];
 			}
-			for(unsigned int j = 0; j < counting_table.size(); ++j)
+			for(auto iter = counting_table.begin(); iter != counting_table.end(); ++iter)
 			{
-				second_interval-=pow(counting_table[j]/(size-i-1),2);
+				second_interval-=pow(iter->second/(size-i-1),2);
 			}
 			counting_table.clear();
 			result.result = (first[i][type]+first[i+1][type])/2;
@@ -97,9 +79,35 @@ giniResult calculateGini(std::vector<std::vector<double>>::iterator first, std::
 			result.idx = i;
 			result.average = fmin(result.average, (first_interval*(i+1)/size)+(second_interval*(size-i-1)/size));
 			result.vieved[type] = true;
-			sortCol::sort(first, last, static_cast<colType>(type));
 		}
 
 	}
 	return result;
 }
+
+double make_average(std::vector<std::vector<double>>& dataSetTable)
+{
+	double average = 0;
+	for(unsigned int i = 0; i < dataSetTable.size(); ++i)
+	{
+		average+=dataSetTable[i][static_cast<int>(colType::medv)];
+	} 
+	average/=dataSetTable.size();
+	for(unsigned int i = 0; i < dataSetTable.size(); ++i)
+	{
+		dataSetTable[i].push_back(dataSetTable[i][static_cast<int>(colType::medv)]-average);
+		dataSetTable[i].push_back(average);
+	} 
+	return average;
+}
+
+void make_new_average(std::vector<std::vector<double>>& dataSetTable)
+{
+	for(unsigned int i = 0; i < dataSetTable.size(); ++i)
+	{
+		dataSetTable[i][static_cast<int>(colType::residuum)]=dataSetTable[i][static_cast<int>(colType::medv)]-dataSetTable[i][static_cast<int>(colType::proposal)];
+	} 
+}
+
+
+

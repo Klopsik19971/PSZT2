@@ -10,18 +10,17 @@ enum nodeType{data, decision};
 class tree_ptr
 {
 public:
-	explicit tree_ptr(nodeType t, std::vector<double>& d);
+	explicit tree_ptr(nodeType t, double d);
 	explicit tree_ptr(nodeType t, double d, colType type);
 	colType get_decision_node_type();
 	double get_decision_node_val();
-	std::vector<double>& get_data_node_val();
-	void add_to_data_node(double d);
+	double get_data_node_val();
 	tree_ptr* L;
 	tree_ptr* R;
 	bool is_decision();
 private:
 	const nodeType node_type;
-	std::vector<double> data;
+	double data;
 	const colType col_type;
 
 	void check_node_type(nodeType t);

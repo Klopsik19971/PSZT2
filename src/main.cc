@@ -24,19 +24,25 @@ int main(int argc, char** argv)
 	}
 	else if(argc == 2)
 		MAX_TREES = atoi(argv[1]);
-	else
+	else if(argc == 3)
+	{
+		MAX_TREES = atoi(argv[1]);
 		LEARNING_RATE = atoi(argv[2]);
+	}
 		
 	std::vector<std::vector<double>> boston;
 	std::vector<std::vector<double>> tests;
 	try
 	{
+		if(MAX_TREES < 1 || LEARNING_RATE < 0 || LEARNING_RATE > 1)
+			throw std::runtime_error("Wrong parameters");
 		data_read::read(boston, "../data/boston.csv");
 		data_read::read(tests, "../data/tests.csv");
 	}	
 	catch	(const std::exception& e)
 	{	
 		std::cerr<<e.what()<<std::endl;
+		return -1;
 	}
 	std::vector<decision_tree> forest;
 	forest.reserve(MAX_TREES);
@@ -44,7 +50,6 @@ int main(int argc, char** argv)
 	auto start = std::chrono::steady_clock::now();
 	
 	double average = make_average(boston);
-	std::cout<<"Make 1 tree..."<<std::endl;
 	for(int i = 0; i < MAX_TREES; ++i)
 	{
 		forest.emplace_back(boston.begin(), boston.end(), boston.size());
@@ -60,6 +65,8 @@ int main(int argc, char** argv)
 	double average_error = 0;
 	std::vector<double> percent;
 	std::vector<double> val;
+	double max_percent = DBL_MIN;
+	double absolute_error = 0;
 	std::cout<<"------------------------------------"<<std::endl;
 	for(unsigned int i = 0; i < tests.size(); ++i)
 	{
@@ -75,6 +82,8 @@ int main(int argc, char** argv)
 		percent.push_back((tests[i][tests[i].size()-1]-prediction[prediction.size()-1])/tests[i][tests[i].size()-1]*100);
 		std::cout<<tests[i][tests[i].size()-1]<<" -> "<<prediction[prediction.size()-1]<<"("<<percent[percent.size()-1]<<"%)"<<std::endl;
 		average_error += fabs(percent[percent.size()-1]);
+		max_percent = fmax(max_percent, fabs(percent[percent.size()-1]));
+		absolute_error +=fabs(tests[i][tests[i].size()-1]-prediction[prediction.size()-1]);
 	}
 	std::cout<<"------------------------------------"<<std::endl;
 	average_error/=tests.size();
@@ -87,5 +96,8 @@ int main(int argc, char** argv)
 	standard_deviation /= tests.size();
 	standard_deviation = sqrt(standard_deviation);
 	std::cout<<"standard_deviation: "<<standard_deviation<<"%"<<std::endl;
+	std::cout<<"max_error_precent: "<<max_percent<<"%"<<std::endl;
+	absolute_error/=tests.size();
+	std::cout<<"absolute_error: "<<absolute_error<<std::endl;
 	return 0;
 }

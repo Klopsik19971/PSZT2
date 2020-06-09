@@ -20,7 +20,7 @@ void decision_tree::make_node(tree_ptr** node, std::vector<std::vector<double>>:
 		sortCol::sort(first, last, static_cast<colType>(temp.type));
 	else
 		sortCol::sort(first, last, static_cast<colType>(g.type));*/
-	//std::cout<<temp.average<<" "<<g.average<<std::endl;
+	std::cout<<temp.average<<" "<<g.average<<std::endl;
 	if(temp.average == DBL_MAX)
 	{
 		std::vector<double> data;

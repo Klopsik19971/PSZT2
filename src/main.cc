@@ -82,12 +82,12 @@ int main(int argc, char** argv)
 		percent.push_back((tests[i][tests[i].size()-1]-prediction[prediction.size()-1])/tests[i][tests[i].size()-1]*100);
 		std::cout<<tests[i][tests[i].size()-1]<<" -> "<<prediction[prediction.size()-1]<<"("<<percent[percent.size()-1]<<"%)"<<std::endl;
 		average_error += fabs(percent[percent.size()-1]);
-		max_percent = fmax(max_percent, fabs(percent[percent.size()-1]));
+		max_percent = fmax(max_percent, fabs(tests[i][tests[i].size()-1]-prediction[prediction.size()-1]));
 		absolute_error +=fabs(tests[i][tests[i].size()-1]-prediction[prediction.size()-1]);
 	}
 	std::cout<<"------------------------------------"<<std::endl;
 	average_error/=tests.size();
-	std::cout<<"average_error: "<<average_error<<"%"<<std::endl;
+	std::cout<<"average_error: "<<average_error<<std::endl;
 	double standard_deviation=0;
 	for(unsigned int i = 0; i < percent.size(); ++i)
 	{

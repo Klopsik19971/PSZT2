@@ -79,11 +79,15 @@ giniResult calculateGini(std::vector<std::vector<double>>::iterator first, std::
 			}
 			//exit(-1);
 			counting_table.clear();
+			double val = first_interval*(i+1)/static_cast<double>(size)+second_interval*(size-i-1)/static_cast<double>(size);
+			if(val < result.average)
+			{
 			result.result = (first[i][type]+first[i+1][type])/2;
 			result.type = static_cast<colType>(type);
 			result.idx = i;
-			result.average = fmin(result.average, (first_interval*(i+1)/static_cast<double>(size))+(second_interval*(size-i-1)/static_cast<double>(size)));
+			result.average = val;
 			result.vieved[type] = true;
+			}
 			//std::cout<<result.average<<" "<<(first_interval*(i+1)/size)/*+(second_interval*(size-i-1)/size*/)<<std::endl;
 			//std::cout<<(first_interval*(i+1)/size)<<" "<<(second_interval*(size-i-1)/size)<<std::endl;
 			//std::cout<<first_interval<<" "<<second_interval<<std::endl<<std::endl;
@@ -108,14 +112,6 @@ double make_average(std::vector<std::vector<double>>& dataSetTable)
 		dataSetTable[i].push_back(average);
 	} 
 	return average;
-}
-
-void make_new_average(std::vector<std::vector<double>>& dataSetTable)
-{
-	for(unsigned int i = 0; i < dataSetTable.size(); ++i)
-	{
-		dataSetTable[i][static_cast<int>(colType::residuum)]=dataSetTable[i][static_cast<int>(colType::medv)]-dataSetTable[i][static_cast<int>(colType::proposal)];
-	} 
 }
 
 

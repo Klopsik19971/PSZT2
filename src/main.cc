@@ -8,11 +8,25 @@
 #include <float.h>
 #include "make_prediction.hpp"
 #include <iomanip>
+#include <chrono>
+#include <math.h>
+#include <stdlib.h>
 
-#define MAX_TREES 10
 
-int main()
+int main(int argc, char** argv)
 {
+	int MAX_TREES;
+	double LEARNING_RATE;
+	if(argc == 1)
+	{
+		MAX_TREES = 10;
+		LEARNING_RATE = 0.5;
+	}
+	else if(argc == 2)
+		MAX_TREES = atoi(argv[1]);
+	else
+		LEARNING_RATE = atoi(argv[2]);
+		
 	std::vector<std::vector<double>> boston;
 	std::vector<std::vector<double>> tests;
 	try
@@ -26,31 +40,52 @@ int main()
 	}
 	std::vector<decision_tree> forest;
 	forest.reserve(MAX_TREES);
+	
+	auto start = std::chrono::steady_clock::now();
+	
 	double average = make_average(boston);
-	forest.emplace_back(boston.begin(), boston.end(), boston.size());
-	make_prediction(boston, forest[forest.size()-1]);
 	std::cout<<"Make 1 tree..."<<std::endl;
-	for(int i = 1; i < MAX_TREES; ++i)
+	for(int i = 0; i < MAX_TREES; ++i)
 	{
-		make_new_average(boston);
 		forest.emplace_back(boston.begin(), boston.end(), boston.size());
-		make_prediction(boston, forest[forest.size()-1]);
+		make_prediction(boston, forest[forest.size()-1], LEARNING_RATE);
 		std::cout<<"Make "<<i+1<<" tree..."<<std::endl;
 	}
-	double prediction;
+
+	auto end = std::chrono::steady_clock::now();
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout<<"elapsed time:"<<elapsed_seconds.count()<<"s"<<std::endl;
+
+	std::vector<double> prediction;
+	double average_error = 0;
+	std::vector<double> percent;
+	std::vector<double> val;
 	std::cout<<"------------------------------------"<<std::endl;
 	for(unsigned int i = 0; i < tests.size(); ++i)
 	{
 		std::cout<<std::fixed<<std::showpoint<<std::setprecision(2);
-		prediction = average;
+		prediction.push_back(average);
+		std::cout<<average<<" ";
 		for(unsigned int j = 0; j < forest.size(); ++j)
 		{
-			prediction += 0.1*forest[j].find_val_in_tree(tests[i]);
+			prediction[prediction.size()-1] += LEARNING_RATE*forest[j].find_val_in_tree(tests[i]);
 			std::cout<<forest[j].find_val_in_tree(tests[i])<<" ";
 		}
 		std::cout<<std::endl;
-		std::cout<<tests[i][tests[i].size()-1]<<" -> "<<prediction<<"("<<(tests[i][tests[i].size()-1]-prediction)/tests[i][tests[i].size()-1]*100<<"%)"<<std::endl;
+		percent.push_back((tests[i][tests[i].size()-1]-prediction[prediction.size()-1])/tests[i][tests[i].size()-1]*100);
+		std::cout<<tests[i][tests[i].size()-1]<<" -> "<<prediction[prediction.size()-1]<<"("<<percent[percent.size()-1]<<"%)"<<std::endl;
+		average_error += fabs(percent[percent.size()-1]);
 	}
 	std::cout<<"------------------------------------"<<std::endl;
+	average_error/=tests.size();
+	std::cout<<"average_error: "<<average_error<<"%"<<std::endl;
+	double standard_deviation=0;
+	for(unsigned int i = 0; i < percent.size(); ++i)
+	{
+		standard_deviation += pow(percent[percent.size()-1]-average_error,2);
+	}
+	standard_deviation /= tests.size();
+	standard_deviation = sqrt(standard_deviation);
+	std::cout<<"standard_deviation: "<<standard_deviation<<"%"<<std::endl;
 	return 0;
 }

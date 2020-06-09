@@ -9,7 +9,7 @@
 #include "make_prediction.hpp"
 #include <iomanip>
 
-#define MAX_TREES 2
+#define MAX_TREES 10
 
 int main()
 {
@@ -45,7 +45,7 @@ int main()
 		prediction = average;
 		for(unsigned int j = 0; j < forest.size(); ++j)
 		{
-			prediction += (1/MAX_TREES)*forest[j].find_val_in_tree(tests[i]);
+			prediction += 0.1*forest[j].find_val_in_tree(tests[i]);
 			std::cout<<forest[j].find_val_in_tree(tests[i])<<" ";
 		}
 		std::cout<<std::endl;

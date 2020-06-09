@@ -9,7 +9,7 @@ class decision_tree
 {
 public:
 	explicit decision_tree(std::vector<std::vector<double>>::iterator first, std::vector<std::vector<double>>::iterator last, unsigned int size);
-	void print_tree(tree_ptr* node);
+	void print_tree(tree_ptr* node, int count);
 	~decision_tree();
 	double find_val_in_tree(std::vector<double>& data);
 	
